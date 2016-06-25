@@ -3,14 +3,13 @@ package graphite
 import (
 	"bufio"
 	"fmt"
-	"log"
 	"net"
-	"reflect"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/launchdarkly/go-metrics"
+	"log"
 )
 
 // GraphiteConfig provides a container with configuration parameters for
@@ -41,9 +40,8 @@ func Graphite(r metrics.Registry, d time.Duration, prefix string, addr *net.TCPA
 // GraphiteWithConfig is a blocking exporter function just like Graphite,
 // but it takes a GraphiteConfig instead.
 func GraphiteWithConfig(c GraphiteConfig) {
-	for _ = range time.Tick(c.FlushInterval) {
+	for range time.Tick(c.FlushInterval) {
 		if err := graphite(&c); nil != err {
-			fmt.Printf("%s\n", err.Error())
 			log.Println(err)
 		}
 	}
@@ -60,15 +58,12 @@ func graphite(c *GraphiteConfig) error {
 	now := time.Now().Unix()
 	du := float64(c.DurationUnit)
 	conn, err := net.DialTCP("tcp", nil, c.Addr)
-	fmt.Printf("Connection: %s\n", conn.RemoteAddr().String())
 	if nil != err {
 		return err
 	}
 	defer conn.Close()
 	w := bufio.NewWriter(conn)
 	c.Registry.Each(func(name string, i interface{}) {
-		t := reflect.TypeOf(i)
-		fmt.Printf("Sending a metric of type: %+v\n", t)
 		switch metric := i.(type) {
 		case metrics.Counter:
 			_, err = fmt.Fprintf(w, "%s.%s.count %d %d\n", c.Prefix, name, metric.Count(), now)
@@ -90,9 +85,7 @@ func graphite(c *GraphiteConfig) error {
 			}
 		case metrics.Meter:
 			m := metric.Snapshot()
-var b int
-			b, err = fmt.Fprintf(w, "%s.%s.count %d %d\n", c.Prefix, name, m.Count(), now)
-			fmt.Printf("wrote %d bytes\n", b)
+			_, err = fmt.Fprintf(w, "%s.%s.count %d %d\n", c.Prefix, name, m.Count(), now)
 			_, err = fmt.Fprintf(w, "%s.%s.one-minute %.2f %d\n", c.Prefix, name, m.Rate1(), now)
 			_, err = fmt.Fprintf(w, "%s.%s.five-minute %.2f %d\n", c.Prefix, name, m.Rate5(), now)
 			_, err = fmt.Fprintf(w, "%s.%s.fifteen-minute %.2f %d\n", c.Prefix, name, m.Rate15(), now)
@@ -113,19 +106,10 @@ var b int
 			_, err = fmt.Fprintf(w, "%s.%s.five-minute %.2f %d\n", c.Prefix, name, t.Rate5(), now)
 			_, err = fmt.Fprintf(w, "%s.%s.fifteen-minute %.2f %d\n", c.Prefix, name, t.Rate15(), now)
 			_, err = fmt.Fprintf(w, "%s.%s.mean-rate %.2f %d\n", c.Prefix, name, t.RateMean(), now)
-		//default:
-		//	fmt.Printf("Got unknown metric type: %+v", i)
-
-		}
-		if err != nil {
-			fmt.Printf("Error: %s\n", err.Error())
-			return
+		default:
+			err = fmt.Errorf("Error sending metrics to Graphite: Got unknown metric type: %+v", i)
 		}
 		err = w.Flush()
-		if err != nil {
-			fmt.Printf("Error: %s\n", err.Error())
-			return
-		}
 	})
 	return err
 }
