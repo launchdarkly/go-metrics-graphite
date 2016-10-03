@@ -18,13 +18,13 @@ func floatEquals(a, b float64) bool {
 
 func ExampleGraphite() {
 	addr, _ := net.ResolveTCPAddr("net", ":2003")
-	go Graphite(metrics.DefaultRegistry, 1*time.Second, "some.prefix", addr)
+	go Graphite(metrics.DefaultRegistry, 1*time.Second, "some.prefix", addr.String())
 }
 
 func ExampleGraphiteWithConfig() {
 	addr, _ := net.ResolveTCPAddr("net", ":2003")
 	go GraphiteWithConfig(GraphiteConfig{
-		Addr:          addr,
+		Addr:          addr.String(),
 		Registry:      metrics.DefaultRegistry,
 		FlushInterval: 1 * time.Second,
 		DurationUnit:  time.Millisecond,
@@ -66,7 +66,7 @@ func NewTestServer(t *testing.T, prefix string) (map[string]float64, net.Listene
 	r := metrics.NewRegistry()
 
 	c := GraphiteConfig{
-		Addr:          ln.Addr().(*net.TCPAddr),
+		Addr:          ln.Addr().(*net.TCPAddr).String(),
 		Registry:      r,
 		FlushInterval: 10 * time.Millisecond,
 		DurationUnit:  time.Millisecond,
