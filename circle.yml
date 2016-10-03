@@ -3,7 +3,8 @@ dependencies:
     - rm -rf ~/.go_workspace/src/github.com/launchdarkly/go-metrics-graphite
     - mkdir -p ~/.go_workspace/src/github.com/launchdarkly/
     - ln -s ~/go-metrics-graphite ~/.go_workspace/src/github.com/launchdarkly/go-metrics-graphite
-    - go get gopkg.in/tools/godep.v74 # lock down our version of godep
+    - go get -u gopkg.in/tools/godep.v74 # lock down our version of godep
+    - go install gopkg.in/tools/godep.v74
     - go version
     - godep version
   override:
