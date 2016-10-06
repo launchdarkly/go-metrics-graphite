@@ -95,7 +95,7 @@ func graphite(c *GraphiteConfig) error {
 			_, err = fmt.Fprintf(w, "%s.%s.fifteen-minute %.2f %d\n", c.Prefix, name, m.Rate15(), now)
 			_, err = fmt.Fprintf(w, "%s.%s.mean %.2f %d\n", c.Prefix, name, m.RateMean(), now)
 		case metrics.Timer:
-			t := metric.Snapshot()
+			t := metric.Clear() // atomically clears and returns snapshot of values before clearing.
 			ps := t.Percentiles(c.Percentiles)
 			_, err = fmt.Fprintf(w, "%s.%s.count %d %d\n", c.Prefix, name, t.Count(), now)
 			_, err = fmt.Fprintf(w, "%s.%s.min %d %d\n", c.Prefix, name, t.Min()/int64(du), now)
