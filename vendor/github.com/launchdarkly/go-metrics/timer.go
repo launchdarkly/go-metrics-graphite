@@ -5,8 +5,13 @@ import (
 	"time"
 )
 
+const(
+	histogram_pool_size = 300000
+)
+
 // Timers capture the duration and rate of events.
 type Timer interface {
+	Clear() Timer // atomically clears and returns a snapshot
 	Count() int64
 	Max() int64
 	Mean() float64
@@ -56,14 +61,13 @@ func NewRegisteredTimer(name string, r Registry) Timer {
 	return c
 }
 
-// NewTimer constructs a new StandardTimer using an exponentially-decaying
-// sample with the same reservoir size and alpha as UNIX load averages.
+// NewTimer constructs a new StandardTimer using a fixed pool size
 func NewTimer() Timer {
 	if UseNilMetrics {
 		return NilTimer{}
 	}
 	return &StandardTimer{
-		histogram: NewHistogram(NewExpDecaySample(1028, 0.015)),
+		histogram: NewHistogram(NewUniformSample(histogram_pool_size)),
 		meter:     NewMeter(),
 	}
 }
@@ -72,6 +76,11 @@ func NewTimer() Timer {
 type NilTimer struct {
 	h Histogram
 	m Meter
+}
+
+// Clear is a no-op.
+func (NilTimer) Clear() Timer {
+	return nil
 }
 
 // Count is a no-op.
@@ -133,6 +142,18 @@ type StandardTimer struct {
 	histogram Histogram
 	meter     Meter
 	mutex     sync.Mutex
+}
+
+func (t *StandardTimer) Clear() Timer {
+	t.mutex.Lock()
+	defer t.mutex.Unlock()
+	s := &TimerSnapshot{
+		histogram: t.histogram.Snapshot().(*HistogramSnapshot),
+		meter:     t.meter.Snapshot().(*MeterSnapshot),
+	}
+	t.histogram.Clear()
+	t.meter.Clear()
+	return s
 }
 
 // Count returns the number of events recorded.
@@ -238,6 +259,11 @@ func (t *StandardTimer) Variance() float64 {
 type TimerSnapshot struct {
 	histogram *HistogramSnapshot
 	meter     *MeterSnapshot
+}
+
+// Clear panics.
+func (*TimerSnapshot) Clear() Timer {
+	panic("Clear called on a TimerSnapshot")
 }
 
 // Count returns the number of events recorded at the time the snapshot was
