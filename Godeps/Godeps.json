@@ -5,7 +5,7 @@
 	"Deps": [
 		{
 			"ImportPath": "github.com/launchdarkly/go-metrics",
-			"Rev": "5d9085a4c68f640b68c8612669315bd2dc400f56"
+			"Rev": "e59290506785bb742873aebda236a05e0572f3ff"
 		}
 	]
 }
