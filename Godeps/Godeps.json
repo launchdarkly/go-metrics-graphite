@@ -1,7 +1,7 @@
 {
 	"ImportPath": "github.com/launchdarkly/go-metrics-graphite",
 	"GoVersion": "go1.6",
-	"GodepVersion": "v74",
+	"GodepVersion": "v79",
 	"Deps": [
 		{
 			"ImportPath": "github.com/launchdarkly/go-metrics",
