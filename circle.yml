@@ -6,6 +6,8 @@ machine:
 dependencies:
   pre:
     - source ../circleci_go.sh && install_go
+  override:
+    - echo "Doing this so CircleCI doesn't try to install go"
 
 test:
   override:
