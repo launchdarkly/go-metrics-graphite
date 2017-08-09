@@ -45,7 +45,8 @@ func NewTestServer(t *testing.T, prefix string) (map[string]float64, net.Listene
 		for {
 			conn, err := ln.Accept()
 			if err != nil {
-				t.Fatal("dummy server error:", err)
+				t.Logf("dummy server error: %v", err)
+				continue
 			}
 			r := bufio.NewReader(conn)
 			line, err := r.ReadString('\n')
