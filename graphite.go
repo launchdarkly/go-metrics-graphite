@@ -8,8 +8,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/launchdarkly/go-metrics"
 	"log"
+
+	"github.com/launchdarkly/go-metrics"
 )
 
 // GraphiteConfig provides a container with configuration parameters for
@@ -76,7 +77,7 @@ func graphite(c *GraphiteConfig) error {
 		case metrics.GaugeFloat64:
 			_, err = fmt.Fprintf(w, "%s.%s.value %f %d\n", c.Prefix, name, metric.Value(), now)
 		case metrics.Histogram:
-			h := metric.Snapshot()
+			h := metric.Clear() // atomically clears and returns snapshot of values before clearing.
 			ps := h.Percentiles(c.Percentiles)
 			_, err = fmt.Fprintf(w, "%s.%s.count %d %d\n", c.Prefix, name, h.Count(), now)
 			_, err = fmt.Fprintf(w, "%s.%s.min %d %d\n", c.Prefix, name, h.Min(), now)
