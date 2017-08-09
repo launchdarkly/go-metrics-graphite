@@ -9,6 +9,8 @@ import (
 	"testing"
 	"time"
 
+	"fmt"
+
 	"github.com/launchdarkly/go-metrics"
 )
 
@@ -45,8 +47,8 @@ func NewTestServer(t *testing.T, prefix string) (map[string]float64, net.Listene
 		for {
 			conn, err := ln.Accept()
 			if err != nil {
-				t.Logf("dummy server error: %v", err)
-				continue
+				fmt.Printf("dummy server error: %v\n", err)
+				return
 			}
 			r := bufio.NewReader(conn)
 			line, err := r.ReadString('\n')
