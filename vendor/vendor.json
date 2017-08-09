@@ -1,0 +1,12 @@
+{
+	"comment": "",
+	"ignore": "test",
+	"package": [
+		{
+			"checksumSHA1": "xnTkrxhMhzbduiUS1/SZJ9Mzo0s=",
+			"path": "github.com/launchdarkly/go-metrics",
+			"revision": "e59290506785bb742873aebda236a05e0572f3ff"
+		}
+	],
+	"rootPath": "github.com/launchdarkly/go-metrics-graphite"
+}
