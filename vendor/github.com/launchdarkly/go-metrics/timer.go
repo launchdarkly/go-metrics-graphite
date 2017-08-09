@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-const(
+const (
 	histogram_pool_size = 300000
 )
 

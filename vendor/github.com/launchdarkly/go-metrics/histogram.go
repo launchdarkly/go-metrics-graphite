@@ -1,8 +1,10 @@
 package metrics
 
+import "sync"
+
 // Histograms calculate distribution statistics from a series of int64 values.
 type Histogram interface {
-	Clear()
+	Clear() Histogram // atomically clears and returns a snapshot
 	Count() int64
 	Max() int64
 	Mean() float64
@@ -51,7 +53,7 @@ type HistogramSnapshot struct {
 }
 
 // Clear panics.
-func (*HistogramSnapshot) Clear() {
+func (*HistogramSnapshot) Clear() Histogram {
 	panic("Clear called on a HistogramSnapshot")
 }
 
@@ -108,7 +110,7 @@ func (h *HistogramSnapshot) Variance() float64 { return h.sample.Variance() }
 type NilHistogram struct{}
 
 // Clear is a no-op.
-func (NilHistogram) Clear() {}
+func (NilHistogram) Clear() Histogram { return NilHistogram{} }
 
 // Count is a no-op.
 func (NilHistogram) Count() int64 { return 0 }
@@ -152,10 +154,17 @@ func (NilHistogram) Variance() float64 { return 0.0 }
 // Sample to bound its memory use.
 type StandardHistogram struct {
 	sample Sample
+	mutex  sync.Mutex
 }
 
 // Clear clears the histogram and its sample.
-func (h *StandardHistogram) Clear() { h.sample.Clear() }
+func (h *StandardHistogram) Clear() Histogram {
+	h.mutex.Lock()
+	defer h.mutex.Unlock()
+	hSnap := &HistogramSnapshot{sample: h.sample.Snapshot().(*SampleSnapshot)}
+	h.sample.Clear()
+	return hSnap
+}
 
 // Count returns the number of samples recorded since the histogram was last
 // cleared.
