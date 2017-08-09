@@ -5,8 +5,8 @@
 		{
 			"checksumSHA1": "nU+P4GZAs8UjDwYjFsPmfh/8UBc=",
 			"path": "github.com/launchdarkly/go-metrics",
-			"revision": "5d4dd5a97e47ea520dcc3c3751670c927f4c10f7",
-			"revisionTime": "2017-08-08T23:54:30Z"
+			"revision": "eaf6f21d2060d08672d5a81689ac78134c871cdf",
+			"revisionTime": "2017-08-09T18:38:27Z"
 		}
 	],
 	"rootPath": "github.com/launchdarkly/go-metrics-graphite"
