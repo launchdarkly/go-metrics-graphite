@@ -1,0 +1,14 @@
+machine:
+  post:
+    - aws s3 cp s3://launchdarkly-artifacts/circleci_go.sh ./circleci_go.sh
+    - source ./circleci_go.sh && get_go
+
+dependencies:
+  pre:
+    - source ../circleci_go.sh && install_go
+
+test:
+  override:
+    - source ../circleci_go.sh && go_enforce
+    - source ../circleci_go.sh && go_build
+    - source ../circleci_go.sh && go_test
