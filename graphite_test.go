@@ -58,7 +58,7 @@ func NewTestServer(t *testing.T, prefix string) (map[string]float64, net.Listene
 				if testing.Verbose() {
 					t.Log("recv", parts[0], i)
 				}
-				res[parts[0]] = res[parts[0]] + i
+				res[parts[0]] = i
 				line, err = r.ReadString('\n')
 			}
 			wg.Done()
@@ -123,6 +123,27 @@ func TestWrites(t *testing.T) {
 	}
 
 	if expected, found := 3000.0, res["foobar.baz.50-percentile"]; !floatEquals(found, expected) {
+		t.Fatal("bad value:", expected, found)
+	}
+
+	wg.Add(1)
+	GraphiteOnce(c)
+	wg.Wait()
+
+	// Expect everything but meters to be cleared after the publish
+	if expected, found := 0.0, res["foobar.foo.count"]; !floatEquals(found, expected) {
+		t.Fatal("bad value:", expected, found)
+	}
+
+	if expected, found := 0.0, res["foobar.baz.count"]; !floatEquals(found, expected) {
+		t.Fatal("bad value:", expected, found)
+	}
+
+	if expected, found := 0.0, res["foobar.baz.99-percentile"]; !floatEquals(found, expected) {
+		t.Fatal("bad value:", expected, found)
+	}
+
+	if expected, found := 0.0, res["foobar.baz.50-percentile"]; !floatEquals(found, expected) {
 		t.Fatal("bad value:", expected, found)
 	}
 }

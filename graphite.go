@@ -71,7 +71,8 @@ func graphite(c *GraphiteConfig) error {
 	c.Registry.Each(func(name string, i interface{}) {
 		switch metric := i.(type) {
 		case metrics.Counter:
-			_, err = fmt.Fprintf(w, "%s.%s.count %d %d\n", c.Prefix, name, metric.Count(), now)
+			ctr := metric.Clear()
+			_, err = fmt.Fprintf(w, "%s.%s.count %d %d\n", c.Prefix, name, ctr.Count(), now)
 		case metrics.Gauge:
 			_, err = fmt.Fprintf(w, "%s.%s.value %d %d\n", c.Prefix, name, metric.Value(), now)
 		case metrics.GaugeFloat64:
