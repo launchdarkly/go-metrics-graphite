@@ -6,7 +6,6 @@ import "sync/atomic"
 type Counter interface {
 	Clear() Counter
 	Count() int64
-	Dec(int64)
 	Inc(int64)
 	Snapshot() Counter
 }
@@ -71,9 +70,6 @@ func (NilCounter) Clear() Counter { return NilCounter{} }
 // Count is a no-op.
 func (NilCounter) Count() int64 { return 0 }
 
-// Dec is a no-op.
-func (NilCounter) Dec(i int64) {}
-
 // Inc is a no-op.
 func (NilCounter) Inc(i int64) {}
 
@@ -95,11 +91,6 @@ func (c *StandardCounter) Clear() Counter {
 // Count returns the current count.
 func (c *StandardCounter) Count() int64 {
 	return atomic.LoadInt64(&c.count)
-}
-
-// Dec decrements the counter by the given amount.
-func (c *StandardCounter) Dec(i int64) {
-	atomic.AddInt64(&c.count, -i)
 }
 
 // Inc increments the counter by the given amount.

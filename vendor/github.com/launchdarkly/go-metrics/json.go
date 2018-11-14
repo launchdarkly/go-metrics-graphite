@@ -15,6 +15,8 @@ func (r *StandardRegistry) MarshalJSON() ([]byte, error) {
 		switch metric := i.(type) {
 		case Counter:
 			values["count"] = metric.Count()
+		case GaugeCounter:
+			values["value"] = metric.Count()
 		case Gauge:
 			values["value"] = metric.Value()
 		case GaugeFloat64:

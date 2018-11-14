@@ -73,6 +73,8 @@ func graphite(c *GraphiteConfig) error {
 		case metrics.Counter:
 			ctr := metric.Clear()
 			_, err = fmt.Fprintf(w, "%s.%s.count %d %d\n", c.Prefix, name, ctr.Count(), now)
+		case metrics.GaugeCounter:
+			_, err = fmt.Fprintf(w, "%s.%s.value %d %d\n", c.Prefix, name, metric.Count(), now)
 		case metrics.Gauge:
 			_, err = fmt.Fprintf(w, "%s.%s.value %d %d\n", c.Prefix, name, metric.Value(), now)
 		case metrics.GaugeFloat64:

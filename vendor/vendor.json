@@ -3,10 +3,10 @@
 	"ignore": "test",
 	"package": [
 		{
-			"checksumSHA1": "R7Y3Kub4KIWV6DTfTOAI4td0WF4=",
+			"checksumSHA1": "cWMonxk38QXl2eXsMPox3YE+ZBU=",
 			"path": "github.com/launchdarkly/go-metrics",
-			"revision": "3ae7a24c4924bce9ffa8bab0abfe46cbeb62d229",
-			"revisionTime": "2018-11-07T23:54:23Z"
+			"revision": "628ed83733b1b099ac10df3aba1dac8484a8d99c",
+			"revisionTime": "2018-11-14T19:36:30Z"
 		}
 	],
 	"rootPath": "github.com/launchdarkly/go-metrics-graphite"

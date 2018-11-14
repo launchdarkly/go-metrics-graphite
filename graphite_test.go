@@ -85,6 +85,8 @@ func TestWrites(t *testing.T) {
 	defer l.Close()
 
 	metrics.GetOrRegisterCounter("foo", r).Inc(2)
+	metrics.GetOrRegisterGaugeCounter("lev", r).Inc(3)
+	metrics.GetOrRegisterGaugeCounter("lev", r).Dec(1)
 
 	// TODO: Use a mock meter rather than wasting 10s to get a QPS.
 	for i := 0; i < 10*4; i++ {
@@ -103,6 +105,10 @@ func TestWrites(t *testing.T) {
 	wg.Wait()
 
 	if expected, found := 2.0, res["foobar.foo.count"]; !floatEquals(found, expected) {
+		t.Fatal("bad value:", expected, found)
+	}
+
+	if expected, found := 2.0, res["foobar.lev.value"]; !floatEquals(found, expected) {
 		t.Fatal("bad value:", expected, found)
 	}
 
@@ -144,6 +150,11 @@ func TestWrites(t *testing.T) {
 	}
 
 	if expected, found := 0.0, res["foobar.baz.50-percentile"]; !floatEquals(found, expected) {
+		t.Fatal("bad value:", expected, found)
+	}
+
+	// Do not expect level counters to be cleared
+	if expected, found := 2.0, res["foobar.lev.value"]; !floatEquals(found, expected) {
 		t.Fatal("bad value:", expected, found)
 	}
 }
