@@ -23,7 +23,7 @@ type GraphiteConfig struct {
 	Prefix        string           // Prefix to be prepended to metric names
 	Percentiles   []float64        // Percentiles to export from timers and histograms
 
-	PreviousCounterValues map[string]int64 // Map of previous values.  When only send the difference between this and the previous value
+	PreviousCounterValues map[string]int64 // Map of previous values.  Only send the difference between this and the current value, and then update this.
 }
 
 // Graphite is a blocking exporter function which reports metrics in r

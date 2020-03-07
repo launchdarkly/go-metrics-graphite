@@ -177,7 +177,7 @@ func TestWritesWithPreviousCounterValues(t *testing.T) {
 	}
 
 	// Does not reset the counter
-	if ctr.Count() != 2 {
-		t.Fatalf("expected counter to still be %d but got: %d", 2, ctr.Count())
+	if expected, found := int64(2), ctr.Count(); found != expected {
+		t.Fatalf("expected counter to still be %d but got: %d", expected, found)
 	}
 }
