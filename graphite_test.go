@@ -158,3 +158,26 @@ func TestWrites(t *testing.T) {
 		t.Fatal("bad value:", expected, found)
 	}
 }
+
+func TestWritesWithPreviousCounterValues(t *testing.T) {
+	res, l, r, c, wg := NewTestServer(t, "foobar2")
+	defer l.Close()
+
+	c.PreviousCounterValues = make(map[string]int64)
+	ctr := metrics.GetOrRegisterCounter("foo", r)
+	ctr.Inc(2)
+
+	wg.Add(1)
+	GraphiteOnce(c)
+	wg.Wait()
+
+	// Returns the expected value
+	if expected, found := 2.0, res["foobar2.foo.count"]; !floatEquals(found, expected) {
+		t.Fatal("bad value:", expected, found)
+	}
+
+	// Does not reset the counter
+	if ctr.Count() != 2 {
+		t.Fatalf("expected counter to still be %d but got: %d", 2, ctr.Count())
+	}
+}
