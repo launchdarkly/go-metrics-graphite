@@ -77,7 +77,7 @@ func graphite(c *GraphiteConfig) error {
 			if c.PreviousCounterValues != nil {
 				current := metric.Snapshot().Count()
 				value = current - c.PreviousCounterValues[name]
-				c.PreviousCounterValues[name] = value
+				c.PreviousCounterValues[name] = current
 			} else {
 				value = metric.Clear().Count()
 			}
