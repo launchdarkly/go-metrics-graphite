@@ -22,6 +22,8 @@ type GraphiteConfig struct {
 	DurationUnit  time.Duration    // Time conversion unit for durations
 	Prefix        string           // Prefix to be prepended to metric names
 	Percentiles   []float64        // Percentiles to export from timers and histograms
+
+	PreviousCounterValues map[string]int64 // Map of previous values.  Only send the difference between this and the current value, and then update this.
 }
 
 // Graphite is a blocking exporter function which reports metrics in r
@@ -71,8 +73,15 @@ func graphite(c *GraphiteConfig) error {
 	c.Registry.Each(func(name string, i interface{}) {
 		switch metric := i.(type) {
 		case metrics.Counter:
-			ctr := metric.Clear()
-			_, err = fmt.Fprintf(w, "%s.%s.count %d %d\n", c.Prefix, name, ctr.Count(), now)
+			var value int64
+			if c.PreviousCounterValues != nil {
+				current := metric.Snapshot().Count()
+				value = current - c.PreviousCounterValues[name]
+				c.PreviousCounterValues[name] = value
+			} else {
+				value = metric.Clear().Count()
+			}
+			_, err = fmt.Fprintf(w, "%s.%s.count %d %d\n", c.Prefix, name, value, now)
 		case metrics.GaugeCounter:
 			_, err = fmt.Fprintf(w, "%s.%s.value %d %d\n", c.Prefix, name, metric.Count(), now)
 		case metrics.Gauge:
