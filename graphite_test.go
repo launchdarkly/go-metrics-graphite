@@ -176,8 +176,18 @@ func TestWritesWithPreviousCounterValues(t *testing.T) {
 		t.Fatal("bad value:", expected, found)
 	}
 
+
+	// Returns the additional increment
+	ctr.Inc(1)
+	wg.Add(1)
+	GraphiteOnce(c)
+	wg.Wait()
+	if expected, found := 1.0, res["foobar2.foo.count"]; !floatEquals(found, expected) {
+		t.Fatal("bad value:", expected, found)
+	}
+
 	// Does not reset the counter
-	if expected, found := int64(2), ctr.Count(); found != expected {
+	if expected, found := int64(3), ctr.Count(); found != expected {
 		t.Fatalf("expected counter to still be %d but got: %d", expected, found)
 	}
 }
